@@ -42,7 +42,7 @@ namespace DAL
             {
                 Id = 1,
                 CreateDate = DateTime.Now,
-                Email = "admin@AspNetCoreUrunSitesi",
+                Email = "admin@aspnetcoreurunsitesi",
                 IsActive = true,
                 IsAdmin = true,
                 Name = "Admin",

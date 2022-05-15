@@ -1,154 +1,106 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using DAL;
+﻿using AspNetCoreUrunSitesi.Utils;
+using BL;
 using Entities;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Threading.Tasks;
 
 namespace AspNetCoreUrunSitesi.Areas.Admin.Controllers
 {
-    [Area("Admin")]
+    [Area("Admin"), Authorize]
     public class SlidersController : Controller
     {
-        private readonly DatabaseContext _context;
+        private readonly IRepository<Slider> _repository;
 
-        public SlidersController(DatabaseContext context)
+        public SlidersController(IRepository<Slider> repository)
         {
-            _context = context;
+            _repository = repository;
         }
 
-        // GET: Admin/Sliders
-        public async Task<IActionResult> Index()
+        // GET: SlidersController
+        public async Task<ActionResult> IndexAsync()
         {
-            return View(await _context.Sliders.ToListAsync());
+            return View(await _repository.GetAllAsync());
         }
 
-        // GET: Admin/Sliders/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var slider = await _context.Sliders
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (slider == null)
-            {
-                return NotFound();
-            }
-
-            return View(slider);
-        }
-
-        // GET: Admin/Sliders/Create
-        public IActionResult Create()
+        // GET: SlidersController/Details/5
+        public ActionResult Details(int id)
         {
             return View();
         }
 
-        // POST: Admin/Sliders/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        // GET: SlidersController/Create
+        public ActionResult Create()
+        {
+            return View();
+        }
+
+        // POST: SlidersController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Content,Image,Link")] Slider slider)
+        public async Task<ActionResult> CreateAsync(Slider slider, IFormFile Image)
         {
-            if (ModelState.IsValid)
+            try
             {
-                _context.Add(slider);
-                await _context.SaveChangesAsync();
+                slider.Image = FileHelper.FileLoader(Image);
+                await _repository.AddAsync(slider);
+                await _repository.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(slider);
+            catch
+            {
+                return View(slider);
+            }
         }
 
-        // GET: Admin/Sliders/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        // GET: SlidersController/Edit/5
+        public async Task<ActionResult> EditAsync(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var slider = await _context.Sliders.FindAsync(id);
-            if (slider == null)
-            {
-                return NotFound();
-            }
-            return View(slider);
+            var data = await _repository.FindAsync(id);
+            return View(data);
         }
 
-        // POST: Admin/Sliders/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        // POST: SlidersController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Content,Image,Link")] Slider slider)
+        public ActionResult Edit(int id, Slider slider, IFormFile Image, bool resmiSil)
         {
-            if (id != slider.Id)
+            try
             {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(slider);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!SliderExists(slider.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+                if (Image != null) slider.Image = FileHelper.FileLoader(Image);
+                if (resmiSil == true) slider.Image = string.Empty;
+                _repository.Update(slider);
                 return RedirectToAction(nameof(Index));
             }
-            return View(slider);
+            catch
+            {
+                return View(slider);
+            }
         }
 
-        // GET: Admin/Sliders/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        // GET: SlidersController/Delete/5
+        public async Task<ActionResult> DeleteAsync(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var slider = await _context.Sliders
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (slider == null)
-            {
-                return NotFound();
-            }
-
-            return View(slider);
+            var data = await _repository.FindAsync(id);
+            return View(data);
         }
 
-        // POST: Admin/Sliders/Delete/5
-        [HttpPost, ActionName("Delete")]
+        // POST: SlidersController/Delete/5
+        [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public ActionResult Delete(int id, Slider slider)
         {
-            var slider = await _context.Sliders.FindAsync(id);
-            _context.Sliders.Remove(slider);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
-        private bool SliderExists(int id)
-        {
-            return _context.Sliders.Any(e => e.Id == id);
+            try
+            {
+                _repository.Delete(slider);
+                return RedirectToAction(nameof(Index));
+            }
+            catch
+            {
+                return View(slider);
+            }
         }
     }
 }

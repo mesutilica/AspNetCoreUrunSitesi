@@ -1,154 +1,106 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using DAL;
+﻿using BL;
 using Entities;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Threading.Tasks;
 
 namespace AspNetCoreUrunSitesi.Areas.Admin.Controllers
 {
-    [Area("Admin")]
+    [Area("Admin"), Authorize]
     public class ContactsController : Controller
     {
-        private readonly DatabaseContext _context;
+        private readonly IRepository<Contact> _repository;
 
-        public ContactsController(DatabaseContext context)
+        public ContactsController(IRepository<Contact> repository)
         {
-            _context = context;
+            _repository = repository;
         }
 
-        // GET: Admin/Contacts
-        public async Task<IActionResult> Index()
+        // GET: ContactsController
+        public async Task<ActionResult> IndexAsync()
         {
-            return View(await _context.Contacts.ToListAsync());
+            return View(await _repository.GetAllAsync());
         }
 
-        // GET: Admin/Contacts/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var contact = await _context.Contacts
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (contact == null)
-            {
-                return NotFound();
-            }
-
-            return View(contact);
-        }
-
-        // GET: Admin/Contacts/Create
-        public IActionResult Create()
+        // GET: ContactsController/Details/5
+        public ActionResult Details(int id)
         {
             return View();
         }
 
-        // POST: Admin/Contacts/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        // GET: ContactsController/Create
+        public ActionResult Create()
+        {
+            return View();
+        }
+
+        // POST: ContactsController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Surname,Email,Phone,Message")] Contact contact)
+        public async Task<ActionResult> CreateAsync(Contact contact)
         {
-            if (ModelState.IsValid)
+            try
             {
-                _context.Add(contact);
-                await _context.SaveChangesAsync();
+                await _repository.AddAsync(contact);
+                await _repository.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(contact);
+            catch
+            {
+                return View();
+            }
         }
 
-        // GET: Admin/Contacts/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        // GET: ContactsController/Edit/5
+        public async Task<ActionResult> EditAsync(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var contact = await _context.Contacts.FindAsync(id);
-            if (contact == null)
-            {
-                return NotFound();
-            }
-            return View(contact);
+            var data = await _repository.FindAsync(id);
+            return View(data);
         }
 
-        // POST: Admin/Contacts/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        // POST: ContactsController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Surname,Email,Phone,Message")] Contact contact)
+        public ActionResult Edit(int id, Contact contact)
         {
-            if (id != contact.Id)
+            try
             {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(contact);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!ContactExists(contact.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+                _repository.Update(contact);
                 return RedirectToAction(nameof(Index));
             }
-            return View(contact);
+            catch
+            {
+                ModelState.AddModelError("","Hata Oluştu!");
+                return View(contact);
+            }
         }
 
-        // GET: Admin/Contacts/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        // GET: ContactsController/Delete/5
+        public async Task<ActionResult> DeleteAsync(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var contact = await _context.Contacts
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (contact == null)
-            {
-                return NotFound();
-            }
-
-            return View(contact);
+            var data = await _repository.FindAsync(id);
+            return View(data);
         }
 
-        // POST: Admin/Contacts/Delete/5
-        [HttpPost, ActionName("Delete")]
+        // POST: ContactsController/Delete/5
+        [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public ActionResult Delete(int id, Contact contact)
         {
-            var contact = await _context.Contacts.FindAsync(id);
-            _context.Contacts.Remove(contact);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
-        private bool ContactExists(int id)
-        {
-            return _context.Contacts.Any(e => e.Id == id);
+            try
+            {
+                var sonuc = _repository.Delete(contact);
+                if (sonuc > 0)
+                {
+                    return RedirectToAction(nameof(Index));
+                }
+            }
+            catch
+            {
+                ModelState.AddModelError("", "Kayıt Silinemedi!");
+            }
+            return View(contact);
         }
     }
 }

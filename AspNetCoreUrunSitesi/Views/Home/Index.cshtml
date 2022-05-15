@@ -1,8 +1,62 @@
-﻿@{
-    ViewData["Title"] = "Ana Sayfa";
-}
+﻿@model AspNetCoreUrunSitesi.Models.HomePageViewModel
+@{ ViewData["Title"] = "Ana Sayfa"; }
 
-<div class="text-center">
-    <h1 class="display-4">Ürün Tanıtım Sitesi</h1>
-    <h2>Hoşgeldiniz</h2>
+<div id="myCarousel" class="carousel slide" data-bs-ride="carousel">
+    <div class="carousel-inner">
+        @foreach (var item in Model.Sliders)
+        {
+            <div class="carousel-item @(item == Model.Sliders.FirstOrDefault() ? "active" : "")">
+                <img src="~/Img/@item.Image" class="img-fluid" />
+            </div>
+        }
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#myCarousel" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#myCarousel" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    </button>
+</div>
+
+<div class="album py-5 bg-light">
+    <div class="container">
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+            @foreach (var item in Model.Products)
+            {
+<div class="col">
+    <a asp-controller="Products" asp-action="Detail" asp-route-id="@item.Id">
+        <div class="card shadow-sm">
+            <img src="/Img/@item.Image" alt="@item.Name" title="@item.Name" class="bd-placeholder-img card-img-top" />
+            <div class="card-body">
+                <p class="card-text">
+                    @item.Name
+                </p>
+            </div>
+        </div>
+    </a>
+</div>
+}
+        </div>
+    </div>
+</div>
+
+<div class="row mb-2">
+    @foreach (var item in Model.News)
+    {
+<div class="col-md-6">
+    <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
+        <div class="col p-4 d-flex flex-column position-static">
+            <h3 class="mb-0">@item.Name</h3>
+            <div class="mb-1 text-muted">
+                @(String.Format("{0:d}", item.CreateDate))
+            </div>
+            <p class="mb-auto">@item.Content</p>
+            <a href="#" class="stretched-link">Devamını Oku</a>
+        </div>
+        <div class="col-auto d-none d-lg-block">
+            <img src="/Img/@item.Image" alt="@item.Name" title="@item.Name" class="img-fluid" />
+
+        </div>
+    </div>
+</div>}
 </div>

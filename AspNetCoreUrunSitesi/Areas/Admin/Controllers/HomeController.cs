@@ -1,12 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace AspNetCoreUrunSitesi.Areas.Admin.Controllers
 {
-    [Area("Admin")] // admin area içindeki controller ların çalışması için bu gerekli!!
+    [Area("Admin"), Authorize] // admin area içindeki controller ların çalışması için bu gerekli!!
     public class HomeController : Controller
     {
         public IActionResult Index()

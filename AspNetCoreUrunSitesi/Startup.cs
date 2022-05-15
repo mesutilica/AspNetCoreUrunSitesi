@@ -2,15 +2,11 @@ using BL;
 using DAL;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.Cookies; // Login
 
 namespace AspNetCoreUrunSitesi
 {
@@ -31,6 +27,10 @@ namespace AspNetCoreUrunSitesi
             services.AddSession(); // Projede session kullanmak istiyoruz
             services.AddDbContext<DatabaseContext>(options => options.UseSqlServer()); // .net core da DbContext imizi bu þekilde projeye bildiriyoruz
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>)); // Dependency Injection ile projemize IRepository ile nesne oluþurulursa oraya Repository classýndan bir örnek göndermesini söyledik
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(x =>
+            {
+                x.LoginPath = "/Admin/Login"; // Admin giriþ ekranýmýz
+            });
 
             //Diðer Dependency Injection yöntemleri :
             // AddSingleton : Uygulama ayaða kalkarken çalýþan ConfigureServices metodunda bu yöntem ile tanýmladýðýmýz her sýnýftan sadece bir örnek oluþturulur. Kim nereden çaðýrýrsa çaðýrsýn kendisine bu örnek gönderilir. Uygulama yeniden baþlayana kadar yenisi üretilmez.

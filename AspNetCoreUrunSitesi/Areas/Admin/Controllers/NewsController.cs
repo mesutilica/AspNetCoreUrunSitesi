@@ -1,154 +1,112 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using DAL;
+﻿using AspNetCoreUrunSitesi.Utils;
+using BL;
 using Entities;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Threading.Tasks;
 
 namespace AspNetCoreUrunSitesi.Areas.Admin.Controllers
 {
-    [Area("Admin")]
+    [Area("Admin"), Authorize]
     public class NewsController : Controller
     {
-        private readonly DatabaseContext _context;
+        private readonly IRepository<News> _repository;
 
-        public NewsController(DatabaseContext context)
+        public NewsController(IRepository<News> repository)
         {
-            _context = context;
+            _repository = repository;
         }
 
-        // GET: Admin/News
-        public async Task<IActionResult> Index()
+        // GET: NewsController
+        public async Task<ActionResult> IndexAsync()
         {
-            return View(await _context.News.ToListAsync());
+            return View(await _repository.GetAllAsync());
         }
 
-        // GET: Admin/News/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var news = await _context.News
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (news == null)
-            {
-                return NotFound();
-            }
-
-            return View(news);
-        }
-
-        // GET: Admin/News/Create
-        public IActionResult Create()
+        // GET: NewsController/Details/5
+        public ActionResult Details(int id)
         {
             return View();
         }
 
-        // POST: Admin/News/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        // GET: NewsController/Create
+        public ActionResult Create()
+        {
+            return View();
+        }
+
+        // POST: NewsController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Content,Image,IsActive")] News news)
+        public async Task<ActionResult> CreateAsync(News news, IFormFile Image)
         {
-            if (ModelState.IsValid)
+            try
             {
-                _context.Add(news);
-                await _context.SaveChangesAsync();
+                news.Image = FileHelper.FileLoader(Image);
+                await _repository.AddAsync(news);
+                await _repository.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(news);
+            catch
+            {
+                return View(news); // hataya düşerse patlamaması için news i sayfaya geri gönder
+            }
         }
 
-        // GET: Admin/News/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        // GET: NewsController/Edit/5
+        public async Task<ActionResult> EditAsync(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var news = await _context.News.FindAsync(id);
-            if (news == null)
-            {
-                return NotFound();
-            }
-            return View(news);
+            var data = await _repository.FindAsync(id);
+            return View(data);
         }
 
-        // POST: Admin/News/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        // POST: NewsController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Content,Image,IsActive")] News news)
+        public ActionResult Edit(int id, News news, IFormFile Image, bool resmiSil)
         {
-            if (id != news.Id)
+            try
             {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
+                if (Image != null)
                 {
-                    _context.Update(news);
-                    await _context.SaveChangesAsync();
+                    news.Image = FileHelper.FileLoader(Image);
                 }
-                catch (DbUpdateConcurrencyException)
+                if (resmiSil == true)
                 {
-                    if (!NewsExists(news.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    news.Image = string.Empty;
                 }
+                _repository.Update(news);
                 return RedirectToAction(nameof(Index));
             }
-            return View(news);
+            catch
+            {
+                return View(news);
+            }
         }
 
-        // GET: Admin/News/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        // GET: NewsController/Delete/5
+        public async Task<ActionResult> DeleteAsync(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var news = await _context.News
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (news == null)
-            {
-                return NotFound();
-            }
-
-            return View(news);
+            var data = await _repository.FindAsync(id);
+            return View(data);
         }
 
-        // POST: Admin/News/Delete/5
-        [HttpPost, ActionName("Delete")]
+        // POST: NewsController/Delete/5
+        [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public ActionResult Delete(int id, News news)
         {
-            var news = await _context.News.FindAsync(id);
-            _context.News.Remove(news);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
-        private bool NewsExists(int id)
-        {
-            return _context.News.Any(e => e.Id == id);
+            try
+            {
+                _repository.Delete(news);
+                return RedirectToAction(nameof(Index));
+            }
+            catch
+            {
+                return View(news);
+            }
         }
     }
 }

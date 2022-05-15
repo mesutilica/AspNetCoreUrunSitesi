@@ -1,154 +1,110 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using BL;
+using Entities;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using DAL;
-using Entities;
+using System;
+using System.Threading.Tasks;
 
 namespace AspNetCoreUrunSitesi.Areas.Admin.Controllers
 {
-    [Area("Admin")]
+    [Area("Admin"), Authorize]
     public class CategoriesController : Controller
     {
-        private readonly DatabaseContext _context;
+        private readonly IRepository<Category> _repository;
 
-        public CategoriesController(DatabaseContext context)
+        public CategoriesController(IRepository<Category> repository)
         {
-            _context = context;
+            _repository = repository;
         }
 
-        // GET: Admin/Categories
-        public async Task<IActionResult> Index()
+        // GET: CategoriesController
+        public async Task<ActionResult> IndexAsync()
         {
-            return View(await _context.Categories.ToListAsync());
+            return View(await _repository.GetAllAsync());
         }
 
-        // GET: Admin/Categories/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var category = await _context.Categories
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (category == null)
-            {
-                return NotFound();
-            }
-
-            return View(category);
-        }
-
-        // GET: Admin/Categories/Create
-        public IActionResult Create()
+        // GET: CategoriesController/Details/5
+        public ActionResult Details(int id)
         {
             return View();
         }
 
-        // POST: Admin/Categories/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        // GET: CategoriesController/Create
+        public async Task<ActionResult> CreateAsync()
+        {
+            ViewBag.ParentId = new SelectList(await _repository.GetAllAsync(), "Id", "Name");
+            return View();
+        }
+
+        // POST: CategoriesController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Descripton,IsActive")] Category category)
+        public async Task<ActionResult> CreateAsync(Category category)
         {
-            if (ModelState.IsValid)
+            try
             {
-                _context.Add(category);
-                await _context.SaveChangesAsync();
+                await _repository.AddAsync(category);
+                await _repository.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(category);
+            catch
+            {
+                return View(category);
+            }
         }
 
-        // GET: Admin/Categories/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        // GET: CategoriesController/Edit/5
+        public async Task<ActionResult> EditAsync(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var category = await _context.Categories.FindAsync(id);
-            if (category == null)
-            {
-                return NotFound();
-            }
-            return View(category);
+            var data = await _repository.FindAsync(id);
+            ViewBag.ParentId = new SelectList(await _repository.GetAllAsync(), "Id", "Name");
+            return View(data);
         }
 
-        // POST: Admin/Categories/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        // POST: CategoriesController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Descripton,IsActive")] Category category)
+        public ActionResult Edit(int id, Category category)
         {
-            if (id != category.Id)
+            try
             {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(category);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!CategoryExists(category.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+                _repository.Update(category);
                 return RedirectToAction(nameof(Index));
             }
-            return View(category);
+            catch
+            {
+                return View(category);
+            }
         }
 
-        // GET: Admin/Categories/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        // GET: CategoriesController/Delete/5
+        public async Task<ActionResult> DeleteAsync(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var category = await _context.Categories
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (category == null)
-            {
-                return NotFound();
-            }
-
-            return View(category);
+            var data = await _repository.FindAsync(id);
+            return View(data);
         }
 
-        // POST: Admin/Categories/Delete/5
-        [HttpPost, ActionName("Delete")]
+        // POST: CategoriesController/Delete/5
+        [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<ActionResult> DeleteAsync(int id, IFormCollection collection)
         {
-            var category = await _context.Categories.FindAsync(id);
-            _context.Categories.Remove(category);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
-        private bool CategoryExists(int id)
-        {
-            return _context.Categories.Any(e => e.Id == id);
+            try
+            {
+                var data = await _repository.FindAsync(id);
+                var sonuc = _repository.Delete(data);
+                if (sonuc > 0)
+                {
+                    return RedirectToAction(nameof(Index));
+                }
+            }
+            catch
+            {
+                ModelState.AddModelError("","Kayıt Silinemedi!");
+            }
+            return View();
         }
     }
 }

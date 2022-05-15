@@ -1,161 +1,119 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using AspNetCoreUrunSitesi.Utils;
+using BL;
+using Entities;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using DAL;
-using Entities;
+using System;
+using System.Threading.Tasks;
 
 namespace AspNetCoreUrunSitesi.Areas.Admin.Controllers
 {
-    [Area("Admin")]
+    [Area("Admin"), Authorize]
     public class ProductsController : Controller
     {
-        private readonly DatabaseContext _context;
-
-        public ProductsController(DatabaseContext context)
+        private readonly IRepository<Product> _repository;
+        private readonly IRepository<Category> _categoryRepository;
+        private readonly IRepository<Brand> _brandRepository;
+        public ProductsController(IRepository<Product> repository, IRepository<Category> categoryRepository, IRepository<Brand> brandRepository)
         {
-            _context = context;
+            _repository = repository;
+            _categoryRepository = categoryRepository;
+            _brandRepository = brandRepository;
         }
 
-        // GET: Admin/Products
-        public async Task<IActionResult> Index()
+        // GET: ProductsController
+        public async Task<ActionResult> IndexAsync()
         {
-            var databaseContext = _context.Products.Include(p => p.Category);
-            return View(await databaseContext.ToListAsync());
+            return View(await _repository.GetAllAsync()); // sayfa modeline veritabanından çektiğimiz ürünleri gönderiyoruz, göndermezsek null references hatası alırız sayfa açılırken !!!
         }
 
-        // GET: Admin/Products/Details/5
-        public async Task<IActionResult> Details(int? id)
+        // GET: ProductsController/Details/5
+        public ActionResult Details(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var product = await _context.Products
-                .Include(p => p.Category)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (product == null)
-            {
-                return NotFound();
-            }
-
-            return View(product);
-        }
-
-        // GET: Admin/Products/Create
-        public IActionResult Create()
-        {
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name");
             return View();
         }
 
-        // POST: Admin/Products/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        // GET: ProductsController/Create
+        public async Task<ActionResult> CreateAsync()
+        {
+            ViewBag.CategoryId = new SelectList(await _categoryRepository.GetAllAsync(), "Id", "Name");
+            ViewBag.BrandId = new SelectList(await _brandRepository.GetAllAsync(), "Id", "Name");
+            return View();
+        }
+
+        // POST: ProductsController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Content,Image,Price,Stock,IsActive,CategoryId")] Product product)
+        public async Task<ActionResult> CreateAsync(Product product, IFormFile Image)
         {
-            if (ModelState.IsValid)
+            try
             {
-                _context.Add(product);
-                await _context.SaveChangesAsync();
+                product.Image = FileHelper.FileLoader(Image);
+                await _repository.AddAsync(product);
+                await _repository.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", product.CategoryId);
-            return View(product);
+            catch
+            {
+                ViewBag.CategoryId = new SelectList(await _categoryRepository.GetAllAsync(), "Id", "Name");
+                ViewBag.BrandId = new SelectList(await _brandRepository.GetAllAsync(), "Id", "Name");
+                ModelState.AddModelError("", "Hata Oluştu!");
+                return View(product);
+            }
         }
 
-        // GET: Admin/Products/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        // GET: ProductsController/Edit/5
+        public async Task<ActionResult> EditAsync(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var product = await _context.Products.FindAsync(id);
-            if (product == null)
-            {
-                return NotFound();
-            }
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", product.CategoryId);
-            return View(product);
+            ViewBag.CategoryId = new SelectList(await _categoryRepository.GetAllAsync(), "Id", "Name");
+            ViewBag.BrandId = new SelectList(await _brandRepository.GetAllAsync(), "Id", "Name");
+            var data = await _repository.FindAsync(id);
+            return View(data);
         }
 
-        // POST: Admin/Products/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        // POST: ProductsController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Content,Image,Price,Stock,IsActive,CategoryId")] Product product)
+        public async Task<ActionResult> EditAsync(int id, Product product, IFormFile Image, bool resmiSil)
         {
-            if (id != product.Id)
+            try
             {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(product);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!ProductExists(product.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+                if (Image != null) product.Image = FileHelper.FileLoader(Image);
+                if (resmiSil == true) product.Image = string.Empty;
+                _repository.Update(product);
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", product.CategoryId);
-            return View(product);
+            catch
+            {
+                ViewBag.CategoryId = new SelectList(await _categoryRepository.GetAllAsync(), "Id", "Name");
+                ViewBag.BrandId = new SelectList(await _brandRepository.GetAllAsync(), "Id", "Name");
+                return View(product);
+            }
         }
 
-        // GET: Admin/Products/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        // GET: ProductsController/Delete/5
+        public async Task<ActionResult> DeleteAsync(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var product = await _context.Products
-                .Include(p => p.Category)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (product == null)
-            {
-                return NotFound();
-            }
-
-            return View(product);
+            var data = await _repository.FindAsync(id);
+            return View(data);
         }
 
-        // POST: Admin/Products/Delete/5
-        [HttpPost, ActionName("Delete")]
+        // POST: ProductsController/Delete/5
+        [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public ActionResult Delete(int id, Product product)
         {
-            var product = await _context.Products.FindAsync(id);
-            _context.Products.Remove(product);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
-        private bool ProductExists(int id)
-        {
-            return _context.Products.Any(e => e.Id == id);
+            try
+            {
+                _repository.Delete(product);
+                return RedirectToAction(nameof(Index));
+            }
+            catch
+            {
+                return View(product);
+            }
         }
     }
 }

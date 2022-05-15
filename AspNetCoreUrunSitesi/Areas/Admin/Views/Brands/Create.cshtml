@@ -1,16 +1,18 @@
 ﻿@model Entities.Brand
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Yeni Ekle";
 }
 
-<h1>Create</h1>
+<h1>Yeni Ekle</h1>
 
-<h4>Brand</h4>
+<h4>Marka Bilgileri</h4>
 <hr />
 <div class="row">
+    <h6>Mvc de resim yükleteceğimiz form elementine  enctype="multipart/form-data" attribute unu eklememiz gerekir!</h6>
     <div class="col-md-4">
-        <form asp-action="Create">
+        <form asp-action="Create" enctype="multipart/form-data">
+
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="Name" class="control-label"></label>
@@ -19,7 +21,7 @@
             </div>
             <div class="form-group">
                 <label asp-for="Logo" class="control-label"></label>
-                <input asp-for="Logo" class="form-control" />
+                <input asp-for="Logo" class="form-control" type="file" /> Resim yüklemek için inputa type="file" attribute unu ekliyoruz.
                 <span asp-validation-for="Logo" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -33,16 +35,13 @@
                 </label>
             </div>
             <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+                <input type="submit" value="Ekle" class="btn btn-primary" />
             </div>
         </form>
     </div>
 </div>
 
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Index">Listeye Dön</a>
 </div>
 
-@section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-}

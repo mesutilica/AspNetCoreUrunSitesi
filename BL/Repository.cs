@@ -85,12 +85,12 @@ namespace BL
 
         public int SaveChanges() // Normal değişikşikleri kaydetme 
         {
-            return SaveChanges();
+            return context.SaveChanges();
         }
 
         public async Task<int> SaveChangesAsync() // Asenkron değişikşikleri kaydetme 
         {
-            return await SaveChangesAsync();
+            return await context.SaveChangesAsync();
         }
 
         public int Update(T entity)

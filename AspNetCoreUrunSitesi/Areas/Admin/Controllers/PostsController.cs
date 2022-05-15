@@ -1,161 +1,113 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using AspNetCoreUrunSitesi.Utils;
+using BL;
+using Entities;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using DAL;
-using Entities;
+using System;
+using System.Threading.Tasks;
 
 namespace AspNetCoreUrunSitesi.Areas.Admin.Controllers
 {
-    [Area("Admin")]
+    [Area("Admin"), Authorize]
     public class PostsController : Controller
     {
-        private readonly DatabaseContext _context;
-
-        public PostsController(DatabaseContext context)
+        private readonly IRepository<Post> _repository;
+        private readonly IRepository<Category> _categoryRepository; // kategorileri çekmek için
+        // sonradan 2. repository i constructor a eklemek için yukardaki _categoryRepository e sağ tıklayıp açılan menüden qucik actions.. ampulüne tıklayıp açılan menüden add parameters to.. ile başlayan menüye tıkladığımızda visual studio bizim için aşağıdaki constructor a dependency injection işlemini gerçekleştiriyor.
+        public PostsController(IRepository<Post> repository, IRepository<Category> categoryRepository)
         {
-            _context = context;
+            _repository = repository;
+            _categoryRepository = categoryRepository;
         }
 
-        // GET: Admin/Posts
-        public async Task<IActionResult> Index()
+        // GET: PostsController
+        public async Task<ActionResult> IndexAsync()
         {
-            var databaseContext = _context.Posts.Include(p => p.Category);
-            return View(await databaseContext.ToListAsync());
+            return View(await _repository.GetAllAsync());
         }
 
-        // GET: Admin/Posts/Details/5
-        public async Task<IActionResult> Details(int? id)
+        // GET: PostsController/Details/5
+        public ActionResult Details(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var post = await _context.Posts
-                .Include(p => p.Category)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (post == null)
-            {
-                return NotFound();
-            }
-
-            return View(post);
-        }
-
-        // GET: Admin/Posts/Create
-        public IActionResult Create()
-        {
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name");
             return View();
         }
 
-        // POST: Admin/Posts/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        // GET: PostsController/Create
+        public async Task<ActionResult> CreateAsync()
+        {
+            ViewBag.CategoryId = new SelectList(await _categoryRepository.GetAllAsync(), "Id", "Name"); // Ön yüzde kategori seçmek için gerekli select elemanına kategori listesini _categoryRepository ile çekip ViewBag üzerinden gönderdik
+            return View();
+        }
+
+        // POST: PostsController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Content,Image,IsActive,CategoryId")] Post post)
+        public async Task<ActionResult> CreateAsync(Post post, IFormFile Image)
         {
-            if (ModelState.IsValid)
+            try
             {
-                _context.Add(post);
-                await _context.SaveChangesAsync();
+                post.Image = FileHelper.FileLoader(Image);
+                await _repository.AddAsync(post);
+                await _repository.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", post.CategoryId);
-            return View(post);
+            catch
+            {
+                ViewBag.CategoryId = new SelectList(await _categoryRepository.GetAllAsync(), "Id", "Name"); // İçerik eklerken eğer hata oluşursa return view dan önce kategroileri selectlist olarak yeniden yollamamız gerekir aksi taktirde post işlemi sonrası ön yüzdeki kategori select list i boş gelir!
+                return View(post);
+            }
         }
 
-        // GET: Admin/Posts/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        // GET: PostsController/Edit/5
+        public async Task<ActionResult> EditAsync(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var post = await _context.Posts.FindAsync(id);
-            if (post == null)
-            {
-                return NotFound();
-            }
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", post.CategoryId);
-            return View(post);
+            ViewBag.CategoryId = new SelectList(await _categoryRepository.GetAllAsync(), "Id", "Name");
+            var data = await _repository.FindAsync(id);
+            return View(data);
         }
 
-        // POST: Admin/Posts/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        // POST: PostsController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Content,Image,IsActive,CategoryId")] Post post)
+        public async Task<ActionResult> EditAsync(int id, Post post, IFormFile Image, bool resmiSil)
         {
-            if (id != post.Id)
+            try
             {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(post);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!PostExists(post.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+                if (Image != null) post.Image = FileHelper.FileLoader(Image);                
+                if (resmiSil == true) post.Image = string.Empty;
+                _repository.Update(post);
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", post.CategoryId);
-            return View(post);
+            catch
+            {
+                ViewBag.CategoryId = new SelectList(await _categoryRepository.GetAllAsync(), "Id", "Name");
+                return View(post);
+            }
         }
 
-        // GET: Admin/Posts/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        // GET: PostsController/Delete/5
+        public async Task<ActionResult> DeleteAsync(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var post = await _context.Posts
-                .Include(p => p.Category)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (post == null)
-            {
-                return NotFound();
-            }
-
-            return View(post);
+            var data = await _repository.FindAsync(id);
+            return View(data);
         }
 
-        // POST: Admin/Posts/Delete/5
-        [HttpPost, ActionName("Delete")]
+        // POST: PostsController/Delete/5
+        [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public ActionResult Delete(int id, Post post)
         {
-            var post = await _context.Posts.FindAsync(id);
-            _context.Posts.Remove(post);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
-        private bool PostExists(int id)
-        {
-            return _context.Posts.Any(e => e.Id == id);
+            try
+            {
+                _repository.Delete(post);
+                return RedirectToAction(nameof(Index));
+            }
+            catch
+            {
+                return View(post);
+            }
         }
     }
 }

@@ -1,154 +1,120 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using DAL;
+using System;
+using System.Threading.Tasks;
 using Entities;
+using BL;
+using AspNetCoreUrunSitesi.Utils;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AspNetCoreUrunSitesi.Areas.Admin.Controllers
 {
-    [Area("Admin")]
+    [Area("Admin"), Authorize] // Authorize attribute u bu controller a gelecek isteklerin admin girişi yapılmış olması şartını koşar, giriş yapmamış istekler engellenir.
     public class BrandsController : Controller
     {
-        private readonly DatabaseContext _context;
+        private readonly IRepository<Brand> _repository;
 
-        public BrandsController(DatabaseContext context)
+        public BrandsController(IRepository<Brand> repository)
         {
-            _context = context;
+            _repository = repository;
         }
 
-        // GET: Admin/Brands
-        public async Task<IActionResult> Index()
+        // GET: BrandsController
+        public async Task<ActionResult> IndexAsync()
         {
-            return View(await _context.Brands.ToListAsync());
+            return View(await _repository.GetAllAsync());
         }
 
-        // GET: Admin/Brands/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var brand = await _context.Brands
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (brand == null)
-            {
-                return NotFound();
-            }
-
-            return View(brand);
-        }
-
-        // GET: Admin/Brands/Create
-        public IActionResult Create()
+        // GET: BrandsController/Details/5
+        public ActionResult Details(int id)
         {
             return View();
         }
 
-        // POST: Admin/Brands/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Logo,Descripton,IsActive")] Brand brand)
+        // GET: BrandsController/Create
+        public ActionResult Create()
         {
-            if (ModelState.IsValid)
-            {
-                _context.Add(brand);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(brand);
+            return View();
         }
 
-        // GET: Admin/Brands/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var brand = await _context.Brands.FindAsync(id);
-            if (brand == null)
-            {
-                return NotFound();
-            }
-            return View(brand);
-        }
-
-        // POST: Admin/Brands/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        // POST: BrandsController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Logo,Descripton,IsActive")] Brand brand)
+        public async Task<ActionResult> CreateAsync(Brand brand, IFormFile Logo) // Resim yükleme için IFormFile Logo diyerek ön yüzden gelecek file upload inputunun adını parametrede geçmeliyiz
         {
-            if (id != brand.Id)
+            try
             {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
+                if (ModelState.IsValid)
                 {
-                    _context.Update(brand);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!BrandExists(brand.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    brand.Logo = FileHelper.FileLoader(Logo); // FileHelper sınıfındaki FileLoader metoduna logo içerisindeki resmi gönderiyoruz
+                    await _repository.AddAsync(brand);
+                    await _repository.SaveChangesAsync();
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(brand);
+            catch
+            {
+                return View(brand);
+            }
         }
 
-        // GET: Admin/Brands/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        // GET: BrandsController/Edit/5
+        public async Task<ActionResult> EditAsync(int id)
         {
-            if (id == null)
+            var data = await _repository.FindAsync(id);
+            if (data == null)
             {
                 return NotFound();
             }
-
-            var brand = await _context.Brands
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (brand == null)
-            {
-                return NotFound();
-            }
-
-            return View(brand);
+            return View(data);
         }
 
-        // POST: Admin/Brands/Delete/5
-        [HttpPost, ActionName("Delete")]
+        // POST: BrandsController/Edit/5
+        [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public ActionResult Edit(int id, Brand brand, IFormFile Logo)
         {
-            var brand = await _context.Brands.FindAsync(id);
-            _context.Brands.Remove(brand);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    brand.Logo = FileHelper.FileLoader(Logo);
+                    _repository.Update(brand);
+                }
+                return RedirectToAction(nameof(Index));
+            }
+            catch
+            {
+                return View(brand);
+            }
         }
 
-        private bool BrandExists(int id)
+        // GET: BrandsController/Delete/5
+        public async Task<ActionResult> DeleteAsync(int id)
         {
-            return _context.Brands.Any(e => e.Id == id);
+            var data = await _repository.FindAsync(id);
+            if (data == null)
+            {
+                return NotFound();
+            }
+            return View(data);
+        }
+
+        // POST: BrandsController/Delete/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> DeleteAsync(int id, IFormCollection collection)
+        {
+            try
+            {
+                var data = await _repository.FindAsync(id);
+                _repository.Delete(data);
+                return RedirectToAction(nameof(Index));
+            }
+            catch
+            {
+                return View();
+            }
         }
     }
 }

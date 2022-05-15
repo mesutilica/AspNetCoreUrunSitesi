@@ -1,18 +1,19 @@
 ﻿@model Entities.Brand
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Düzenle";
 }
 
-<h1>Edit</h1>
+<h1>Düzenle</h1>
 
-<h4>Brand</h4>
+<h4>Marka</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Edit">
+        <form asp-action="Edit" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="CreateDate" />
             <div class="form-group">
                 <label asp-for="Name" class="control-label"></label>
                 <input asp-for="Name" class="form-control" />
@@ -20,7 +21,7 @@
             </div>
             <div class="form-group">
                 <label asp-for="Logo" class="control-label"></label>
-                <input asp-for="Logo" class="form-control" />
+                <input asp-for="Logo" class="form-control" type="file" />
                 <span asp-validation-for="Logo" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -34,16 +35,13 @@
                 </label>
             </div>
             <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
+                <input type="submit" value="Kaydet" class="btn btn-success" />
             </div>
         </form>
     </div>
 </div>
 
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Index">Listeye Dön</a>
 </div>
 
-@section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-}
