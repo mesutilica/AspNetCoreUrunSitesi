@@ -62,12 +62,14 @@ namespace AspNetCoreUrunSitesi
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
-                name: "admin", // area adýný buraya yazýyoruz
-                pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}"
-              );
+                name: "ApiAdmin", // area adýný buraya yazýyoruz
+                pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
                 endpoints.MapControllerRoute(
-                    name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                name: "admin", // area adýný buraya yazýyoruz
+                pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
+                endpoints.MapControllerRoute(
+                name: "default",
+                pattern: "{controller=Home}/{action=Index}/{id?}");
             });
         }
     }
