@@ -75,7 +75,7 @@ namespace AspNetCoreUrunSitesi.Areas.Admin.Controllers
         {
             try
             {
-                if (Image != null) post.Image = FileHelper.FileLoader(Image);                
+                if (Image != null) post.Image = FileHelper.FileLoader(Image);
                 if (resmiSil == true) post.Image = string.Empty;
                 _repository.Update(post);
                 return RedirectToAction(nameof(Index));

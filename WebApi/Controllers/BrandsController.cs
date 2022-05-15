@@ -1,8 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using BL;
+using Entities;
+using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using BL;
-using Entities;
 
 namespace WebApi.Controllers
 {
@@ -44,7 +44,7 @@ namespace WebApi.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult> Put(int id, Brand brand)
         {
-            if (id != brand.Id) return BadRequest();            
+            if (id != brand.Id) return BadRequest();
             _repository.Update(brand);
             await _repository.SaveChangesAsync();
 

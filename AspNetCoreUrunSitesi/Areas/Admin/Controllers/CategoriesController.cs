@@ -102,7 +102,7 @@ namespace AspNetCoreUrunSitesi.Areas.Admin.Controllers
             }
             catch
             {
-                ModelState.AddModelError("","Kayıt Silinemedi!");
+                ModelState.AddModelError("", "Kayıt Silinemedi!");
             }
             return View();
         }

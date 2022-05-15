@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using BL;
+﻿using BL;
 using Entities;
+using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
 namespace AspNetCoreUrunSitesi.ViewComponents
