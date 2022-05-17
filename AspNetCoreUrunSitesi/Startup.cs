@@ -27,6 +27,7 @@ namespace AspNetCoreUrunSitesi
             services.AddSession(); // Projede session kullanmak istiyoruz
             services.AddDbContext<DatabaseContext>(options => options.UseSqlServer()); // .net core da DbContext imizi bu þekilde projeye bildiriyoruz
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>)); // Dependency Injection ile projemize IRepository ile nesne oluþurulursa oraya Repository classýndan bir örnek göndermesini söyledik
+            services.AddHttpClient(); // Controller da Ihttpclientfactory kullanabilmek için
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(x =>
             {
                 x.LoginPath = "/Admin/Login"; // Admin giriþ ekranýmýz
