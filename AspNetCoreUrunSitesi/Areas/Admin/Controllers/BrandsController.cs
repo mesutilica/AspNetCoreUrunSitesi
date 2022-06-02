@@ -1,11 +1,11 @@
-﻿using AspNetCoreUrunSitesi.Utils;
-using BL;
-using Entities;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
+using Entities;
+using BL;
+using AspNetCoreUrunSitesi.Utils;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AspNetCoreUrunSitesi.Areas.Admin.Controllers
 {
@@ -72,13 +72,19 @@ namespace AspNetCoreUrunSitesi.Areas.Admin.Controllers
         // POST: BrandsController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, Brand brand, IFormFile Logo)
+        public ActionResult Edit(int id, Brand brand, IFormFile Logo, bool resmiSil)
         {
             try
             {
                 if (ModelState.IsValid)
                 {
-                    brand.Logo = FileHelper.FileLoader(Logo);
+                    if (resmiSil == true)
+                    {
+                        FileHelper.FileRemover(brand.Logo);
+                        brand.Logo = string.Empty;
+                    }
+
+                    if (Logo != null) brand.Logo = FileHelper.FileLoader(Logo);
                     _repository.Update(brand);
                 }
                 return RedirectToAction(nameof(Index));
@@ -108,6 +114,7 @@ namespace AspNetCoreUrunSitesi.Areas.Admin.Controllers
             try
             {
                 var data = await _repository.FindAsync(id);
+                FileHelper.FileRemover(data.Logo);
                 _repository.Delete(data);
                 return RedirectToAction(nameof(Index));
             }

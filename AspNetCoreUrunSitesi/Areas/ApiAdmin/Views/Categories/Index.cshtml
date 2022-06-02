@@ -1,10 +1,10 @@
-﻿@model IEnumerable<Entities.Brand>
+﻿@model IEnumerable<Entities.Category>
 
 @{
-    ViewData["Title"] = "Markalar";
+    ViewData["Title"] = "Kategoriler";
 }
 
-<h1>Markalar</h1>
+<h1>Kategoriler</h1>
 
 <p>
     <a asp-action="Create" class="btn btn-outline-primary">Yeni Ekle</a>
@@ -16,13 +16,16 @@
                 @Html.DisplayNameFor(model => model.Name)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Logo)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Descripton)
+                @Html.DisplayNameFor(model => model.OrderNo)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.IsActive)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IsTopMenu)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CreateDate)
             </th>
             <th></th>
         </tr>
@@ -35,13 +38,16 @@
                     @Html.DisplayFor(modelItem => item.Name)
                 </td>
                 <td>
-                    <img src="/Img/@item.Logo" alt="Logo Yüklenmemiş" title="@item.Logo" height="40" />
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Descripton)
+                    @Html.DisplayFor(modelItem => item.OrderNo)
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.IsActive)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.IsTopMenu)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CreateDate)
                 </td>
                 <td>
                     <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-primary btn-sm">Düzenle</a> |

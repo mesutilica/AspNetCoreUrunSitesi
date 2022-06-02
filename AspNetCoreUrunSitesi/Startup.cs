@@ -30,7 +30,7 @@ namespace AspNetCoreUrunSitesi
             services.AddHttpClient(); // Controller da Ihttpclientfactory kullanabilmek için
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(x =>
             {
-                x.LoginPath = "/Admin/Login"; // Admin giriþ ekranýmýz
+                x.LoginPath = "/ApiAdmin/Login"; // Admin giriþ ekranýmýz
             });
 
             //Diðer Dependency Injection yöntemleri :

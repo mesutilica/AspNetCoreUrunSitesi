@@ -71,7 +71,7 @@ namespace AspNetCoreUrunSitesi.Areas.Admin.Controllers
             }
             catch
             {
-                ModelState.AddModelError("", "Hata Oluştu!");
+                ModelState.AddModelError("","Hata Oluştu!");
                 return View(contact);
             }
         }

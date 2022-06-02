@@ -8,9 +8,9 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
-namespace AspNetCoreUrunSitesi.Areas.Admin.Controllers
+namespace AspNetCoreUrunSitesi.Areas.ApiAdmin.Controllers
 {
-    [Area("Admin")]
+    [Area("ApiAdmin")]
     public class LoginController : Controller
     {
         private readonly IRepository<AppUser> _repository;
@@ -43,7 +43,7 @@ namespace AspNetCoreUrunSitesi.Areas.Admin.Controllers
                     var userIdentity = new ClaimsIdentity(claims, "Login");
                     ClaimsPrincipal principal = new(userIdentity);
                     await HttpContext.SignInAsync(principal);
-                    return Redirect("/Admin/Home");
+                    return Redirect("/ApiAdmin/Home");
                 }
             }
             catch (Exception hata)

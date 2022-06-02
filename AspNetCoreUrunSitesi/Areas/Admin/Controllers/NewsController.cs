@@ -75,6 +75,7 @@ namespace AspNetCoreUrunSitesi.Areas.Admin.Controllers
                 }
                 if (resmiSil == true)
                 {
+                    FileHelper.FileRemover(news.Image);
                     news.Image = string.Empty;
                 }
                 _repository.Update(news);
@@ -100,6 +101,7 @@ namespace AspNetCoreUrunSitesi.Areas.Admin.Controllers
         {
             try
             {
+                FileHelper.FileRemover(news.Image);
                 _repository.Delete(news);
                 return RedirectToAction(nameof(Index));
             }

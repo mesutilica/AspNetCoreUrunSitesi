@@ -5,6 +5,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Areas\Admin\Data\**" />
+    <Compile Remove="Areas\Admin\Models\**" />
+    <Content Remove="Areas\Admin\Data\**" />
+    <Content Remove="Areas\Admin\Models\**" />
+    <EmbeddedResource Remove="Areas\Admin\Data\**" />
+    <EmbeddedResource Remove="Areas\Admin\Models\**" />
+    <None Remove="Areas\Admin\Data\**" />
+    <None Remove="Areas\Admin\Models\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.16" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.16">
       <PrivateAssets>all</PrivateAssets>
@@ -23,10 +34,77 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Areas\Admin\Data\" />
-    <Folder Include="Areas\Admin\Models\" />
     <Folder Include="Areas\ApiAdmin\Data\" />
     <Folder Include="Areas\ApiAdmin\Models\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Areas\Admin\Views\AppUsers\Create.cshtml" />
+    <None Include="Areas\Admin\Views\AppUsers\Delete.cshtml" />
+    <None Include="Areas\Admin\Views\AppUsers\Details.cshtml" />
+    <None Include="Areas\Admin\Views\AppUsers\Edit.cshtml" />
+    <None Include="Areas\Admin\Views\AppUsers\Index.cshtml" />
+    <None Include="Areas\Admin\Views\AppUser\Create.cshtml" />
+    <None Include="Areas\Admin\Views\AppUser\Delete.cshtml" />
+    <None Include="Areas\Admin\Views\AppUser\Edit.cshtml" />
+    <None Include="Areas\Admin\Views\AppUser\Index.cshtml" />
+    <None Include="Areas\Admin\Views\Brands\Create.cshtml" />
+    <None Include="Areas\Admin\Views\Brands\Delete.cshtml" />
+    <None Include="Areas\Admin\Views\Brands\Details.cshtml" />
+    <None Include="Areas\Admin\Views\Brands\Edit.cshtml" />
+    <None Include="Areas\Admin\Views\Brands\Index.cshtml" />
+    <None Include="Areas\Admin\Views\Categories\Create.cshtml" />
+    <None Include="Areas\Admin\Views\Categories\Delete.cshtml" />
+    <None Include="Areas\Admin\Views\Categories\Details.cshtml" />
+    <None Include="Areas\Admin\Views\Categories\Edit.cshtml" />
+    <None Include="Areas\Admin\Views\Categories\Index.cshtml" />
+    <None Include="Areas\Admin\Views\Contacts\Create.cshtml" />
+    <None Include="Areas\Admin\Views\Contacts\Delete.cshtml" />
+    <None Include="Areas\Admin\Views\Contacts\Details.cshtml" />
+    <None Include="Areas\Admin\Views\Contacts\Edit.cshtml" />
+    <None Include="Areas\Admin\Views\Contacts\Index.cshtml" />
+    <None Include="Areas\Admin\Views\Home\Index.cshtml" />
+    <None Include="Areas\Admin\Views\Login\Index.cshtml" />
+    <None Include="Areas\Admin\Views\News\Create.cshtml" />
+    <None Include="Areas\Admin\Views\News\Delete.cshtml" />
+    <None Include="Areas\Admin\Views\News\Details.cshtml" />
+    <None Include="Areas\Admin\Views\News\Edit.cshtml" />
+    <None Include="Areas\Admin\Views\News\Index.cshtml" />
+    <None Include="Areas\Admin\Views\Posts\Create.cshtml" />
+    <None Include="Areas\Admin\Views\Posts\Delete.cshtml" />
+    <None Include="Areas\Admin\Views\Posts\Details.cshtml" />
+    <None Include="Areas\Admin\Views\Posts\Edit.cshtml" />
+    <None Include="Areas\Admin\Views\Posts\Index.cshtml" />
+    <None Include="Areas\Admin\Views\Products\Create.cshtml" />
+    <None Include="Areas\Admin\Views\Products\Delete.cshtml" />
+    <None Include="Areas\Admin\Views\Products\Details.cshtml" />
+    <None Include="Areas\Admin\Views\Products\Edit.cshtml" />
+    <None Include="Areas\Admin\Views\Products\Index.cshtml" />
+    <None Include="Areas\Admin\Views\Shared\Error.cshtml" />
+    <None Include="Areas\Admin\Views\Shared\_Layout.cshtml" />
+    <None Include="Areas\Admin\Views\Shared\_ValidationScriptsPartial.cshtml" />
+    <None Include="Areas\Admin\Views\Sliders\Create.cshtml" />
+    <None Include="Areas\Admin\Views\Sliders\Delete.cshtml" />
+    <None Include="Areas\Admin\Views\Sliders\Details.cshtml" />
+    <None Include="Areas\Admin\Views\Sliders\Edit.cshtml" />
+    <None Include="Areas\Admin\Views\Sliders\Index.cshtml" />
+    <None Include="Areas\Admin\Views\_ViewImports.cshtml" />
+    <None Include="Areas\Admin\Views\_ViewStart.cshtml" />
+    <None Include="Areas\ApiAdmin\Views\AppUser\Create.cshtml" />
+    <None Include="Areas\ApiAdmin\Views\AppUser\Delete.cshtml" />
+    <None Include="Areas\ApiAdmin\Views\AppUser\Edit.cshtml" />
+    <None Include="Areas\ApiAdmin\Views\AppUser\Index.cshtml" />
+    <None Include="Areas\ApiAdmin\Views\Home\Index.cshtml" />
+    <None Include="Areas\ApiAdmin\Views\Shared\Error.cshtml" />
+    <None Include="Areas\ApiAdmin\Views\Shared\_Layout.cshtml" />
+    <None Include="Areas\ApiAdmin\Views\Shared\_ValidationScriptsPartial.cshtml" />
+    <None Include="Areas\ApiAdmin\Views\Sliders\Create.cshtml" />
+    <None Include="Areas\ApiAdmin\Views\Sliders\Delete.cshtml" />
+    <None Include="Areas\ApiAdmin\Views\Sliders\Details.cshtml" />
+    <None Include="Areas\ApiAdmin\Views\Sliders\Edit.cshtml" />
+    <None Include="Areas\ApiAdmin\Views\Sliders\Index.cshtml" />
+    <None Include="Areas\ApiAdmin\Views\_ViewImports.cshtml" />
+    <None Include="Areas\ApiAdmin\Views\_ViewStart.cshtml" />
   </ItemGroup>
 
 </Project>

@@ -1,20 +1,17 @@
-﻿@model Entities.Post
+﻿@model Entities.News
 
 @{
-    ViewData["Title"] = "Düzenle";
+    ViewData["Title"] = "Yeni Ekle";
 }
 
-<h1>Düzenle</h1>
+<h1>Yeni Ekle</h1>
 
-<h4>İçerik Bilgileri</h4>
+<h4>Haber Bilgileri</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Edit" enctype="multipart/form-data">
+        <form asp-action="Create" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Id" />
-            <input type="hidden" asp-for="Image" />
-            <input type="hidden" asp-for="CreateDate" />
             <div class="form-group">
                 <label asp-for="Name" class="control-label"></label>
                 <input asp-for="Name" class="form-control" />
@@ -31,23 +28,12 @@
                 <span asp-validation-for="Image" class="text-danger"></span>
             </div>
             <div class="form-group form-check">
-                <img src="/Img/@Model.Image" alt="Resim Yok" height="60" />
-                <label class="form-check-label">
-                    @Html.CheckBox("resmiSil") Resmi Sil
-                </label>
-            </div>
-            <div class="form-group form-check">
                 <label class="form-check-label">
                     <input class="form-check-input" asp-for="IsActive" /> @Html.DisplayNameFor(model => model.IsActive)
                 </label>
             </div>
             <div class="form-group">
-                <label asp-for="CategoryId" class="control-label"></label>
-                <select asp-for="CategoryId" class="form-select" asp-items="ViewBag.CategoryId"></select>
-                <span asp-validation-for="CategoryId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Kaydet" class="btn btn-primary" />
+                <input type="submit" value="Ekle" class="btn btn-primary" />
             </div>
         </form>
     </div>

@@ -76,7 +76,11 @@ namespace AspNetCoreUrunSitesi.Areas.Admin.Controllers
             try
             {
                 if (Image != null) post.Image = FileHelper.FileLoader(Image);
-                if (resmiSil == true) post.Image = string.Empty;
+                if (resmiSil == true)
+                {
+                    FileHelper.FileRemover(fileName: post.Image);
+                    post.Image = string.Empty;
+                }
                 _repository.Update(post);
                 return RedirectToAction(nameof(Index));
             }
@@ -102,6 +106,7 @@ namespace AspNetCoreUrunSitesi.Areas.Admin.Controllers
             try
             {
                 _repository.Delete(post);
+                FileHelper.FileRemover(fileName: post.Image);
                 return RedirectToAction(nameof(Index));
             }
             catch

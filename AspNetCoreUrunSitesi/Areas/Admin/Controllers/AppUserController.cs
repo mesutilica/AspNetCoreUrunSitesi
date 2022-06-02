@@ -1,9 +1,9 @@
-﻿using BL;
-using Entities;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
+using BL;
+using Entities;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AspNetCoreUrunSitesi.Areas.Admin.Controllers
 {
@@ -79,7 +79,7 @@ namespace AspNetCoreUrunSitesi.Areas.Admin.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    var sonuc = _repository.Update(appUser);
+                   var sonuc =  _repository.Update(appUser);
                 }
                 return RedirectToAction(nameof(Index));
             }

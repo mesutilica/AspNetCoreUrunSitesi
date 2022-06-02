@@ -81,7 +81,11 @@ namespace AspNetCoreUrunSitesi.Areas.Admin.Controllers
             try
             {
                 if (Image != null) product.Image = FileHelper.FileLoader(Image);
-                if (resmiSil == true) product.Image = string.Empty;
+                if (resmiSil == true)
+                {
+                    FileHelper.FileRemover(product.Image); // dosya silme metodumuzu çağırdık ve ürün resim adını silinmek üzere parametreyle gönderdik
+                    product.Image = string.Empty;
+                }
                 _repository.Update(product);
                 return RedirectToAction(nameof(Index));
             }
@@ -107,6 +111,7 @@ namespace AspNetCoreUrunSitesi.Areas.Admin.Controllers
         {
             try
             {
+                FileHelper.FileRemover(product.Image);
                 _repository.Delete(product);
                 return RedirectToAction(nameof(Index));
             }

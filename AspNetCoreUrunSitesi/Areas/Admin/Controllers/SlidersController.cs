@@ -70,7 +70,11 @@ namespace AspNetCoreUrunSitesi.Areas.Admin.Controllers
             try
             {
                 if (Image != null) slider.Image = FileHelper.FileLoader(Image);
-                if (resmiSil == true) slider.Image = string.Empty;
+                if (resmiSil == true)
+                {
+                    FileHelper.FileRemover(fileName: slider.Image);
+                    slider.Image = string.Empty;
+                }
                 _repository.Update(slider);
                 return RedirectToAction(nameof(Index));
             }
@@ -94,6 +98,7 @@ namespace AspNetCoreUrunSitesi.Areas.Admin.Controllers
         {
             try
             {
+                FileHelper.FileRemover(fileName: slider.Image);
                 _repository.Delete(slider);
                 return RedirectToAction(nameof(Index));
             }
