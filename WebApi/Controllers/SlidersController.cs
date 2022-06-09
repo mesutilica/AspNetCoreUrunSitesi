@@ -36,9 +36,9 @@ namespace WebApi.Controllers
 
         // POST api/<SlidersController>
         [HttpPost]
-        public async Task<ActionResult<Slider>> PostAsync(Slider slider, IFormFile Image)
+        public async Task<ActionResult<Slider>> PostAsync(Slider slider)//, IFormFile Image
         {
-            slider.Image = FileHelper.FileLoader(Image);
+            //slider.Image = await FileHelper.FileLoader(Image);
             await _repository.AddAsync(slider);
             await _repository.SaveChangesAsync();
 
