@@ -22,6 +22,7 @@ namespace AspNetCoreUrunSitesi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddMvc(); // session vb mvc servisleri için
             services.AddControllersWithViews();
             services.AddRazorPages();
             services.AddSession(); // Projede session kullanmak istiyoruz
@@ -52,10 +53,12 @@ namespace AspNetCoreUrunSitesi
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
             app.UseRouting();
+            app.UseSession();// session kullanmak için
 
             app.UseAuthentication(); // Uygulamada oturum açmayý aktif et
             app.UseAuthorization(); // Uygulamada yetkilendirmeyi aktif et
