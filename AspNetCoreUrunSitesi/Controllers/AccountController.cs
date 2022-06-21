@@ -30,7 +30,7 @@ namespace AspNetCoreUrunSitesi.Controllers
         [HttpPost]
         public IActionResult Login(LoginViewModel loginViewModel)
         {
-            if (!ModelState.IsValid)
+            if (ModelState.IsValid)
             {
                 var account = _repository.Get(x => x.Username == loginViewModel.Username & x.Password == loginViewModel.Password & x.IsActive);
                 if (account == null) // Girilen bilgilere göre eşleşen kayıt yoksa
@@ -41,6 +41,7 @@ namespace AspNetCoreUrunSitesi.Controllers
                 {
                     //HttpContext.Session.SetString("login", account.Id.ToString());
                     HttpContext.Session.SetInt32("login", account.Id);
+                    return RedirectToAction("Index");
                 }
             }
             return View(loginViewModel);
