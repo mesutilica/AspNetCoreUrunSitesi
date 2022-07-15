@@ -1,15 +1,65 @@
-﻿
+﻿@model Entities.AppUser
+
 @{
     ViewData["Title"] = "Hesabım";
 }
 
 <h1>Hesabım</h1>
+<div class="container">
+    <div class="row">
+        <div class="col-sm-3">
+            <partial name="_LoginMenu" />
 
-<partial name="_LoginMenu" />
+            <hr />
 
-<hr />
+            @await Html.PartialAsync("_LoginMenu")
+            <hr />
+            @ViewBag.Usr
+        </div>
+        <div class="col-sm-9">
+            <form asp-action="Index">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="CreateDate" />
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Surname" class="control-label"></label>
+                <input asp-for="Surname" class="form-control" />
+                <span asp-validation-for="Surname" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Email" class="control-label"></label>
+                <input asp-for="Email" class="form-control" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Phone" class="control-label"></label>
+                <input asp-for="Phone" class="form-control" />
+                <span asp-validation-for="Phone" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Username" class="control-label"></label>
+                <input asp-for="Username" class="form-control" />
+                <span asp-validation-for="Username" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Password" class="control-label"></label>
+                <input asp-for="Password" class="form-control" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group mt-3">
+                <input type="submit" value="Kaydet" class="btn btn-success" />
+            </div>
+        </form>
+        </div>
+    </div>
+</div>
 
-@await Html.PartialAsync("_LoginMenu")
 
 @section Scripts{
     <script>

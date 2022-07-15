@@ -38,7 +38,9 @@ namespace AspNetCoreUrunSitesi.Areas.Admin.Controllers
                 {
                     var claims = new List<Claim>()
                     {
-                        new Claim(ClaimTypes.Email, account.Email)
+                        new Claim(ClaimTypes.Email, account.Email),
+                        new Claim("role", "Admin"),
+                        new Claim("AdminId", account.Id.ToString())
                     };
                     var userIdentity = new ClaimsIdentity(claims, "Login");
                     ClaimsPrincipal principal = new(userIdentity);
@@ -46,7 +48,7 @@ namespace AspNetCoreUrunSitesi.Areas.Admin.Controllers
                     return Redirect("/Admin/Home");
                 }
             }
-            catch (Exception hata)
+            catch
             {
                 ModelState.AddModelError("", "Hata Oluştu!");
             }

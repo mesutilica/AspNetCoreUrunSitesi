@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace AspNetCoreUrunSitesi.Areas.Admin.Controllers
 {
-    [Area("Admin"), Authorize] // Bu attribute u yazmazsak aşağıdaki sayfalar 404 bulunamadı hatası verir!
+    [Area("Admin"), Authorize(Policy = "AdminPolicy")] // Bu attribute u yazmazsak aşağıdaki sayfalar 404 bulunamadı hatası verir!
     public class AppUserController : Controller
     {
         AppUserManager manager = new AppUserManager(); // Normalde kullandığımız klasik yöntem
@@ -79,7 +79,7 @@ namespace AspNetCoreUrunSitesi.Areas.Admin.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                   var sonuc =  _repository.Update(appUser);
+                    var sonuc = _repository.Update(appUser);
                 }
                 return RedirectToAction(nameof(Index));
             }

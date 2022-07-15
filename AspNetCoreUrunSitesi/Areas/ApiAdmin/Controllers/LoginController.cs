@@ -52,7 +52,7 @@ namespace AspNetCoreUrunSitesi.Areas.ApiAdmin.Controllers
             }
             return View();
         }
-        [Route("Admin/Logout")] // Bu adrese gelen istek olursa çıkış yap
+        [Route("ApiAdmin/Logout")] // Bu adrese gelen istek olursa çıkış yap
         public async Task<IActionResult> LogoutAsync()
         {
             await HttpContext.SignOutAsync();

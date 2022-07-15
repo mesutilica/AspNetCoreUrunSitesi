@@ -26,7 +26,12 @@
                 <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3">
                     <input type="search" class="form-control" placeholder="Ara..." aria-label="Search">
                 </form>
-                <a href="/Account" class="btn btn-primary">Login</a>
+                <a href="/Account/UserLogin" class="btn btn-primary">Giriş</a>
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <a href="/Account" class="btn btn-outline-primary ms-1">Hesabım</a>
+                    <a href="/Logout" class="btn btn-outline-danger ms-1">Çıkış</a>
+                }
             </div>
         </div>
     </header>
@@ -52,7 +57,7 @@
     </footer>
 
     @*<script src="~/lib/jquery/dist/jquery.min.js"></script>
-        <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>*@
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>*@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)

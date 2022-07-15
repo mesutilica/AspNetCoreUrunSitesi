@@ -31,9 +31,16 @@ namespace AspNetCoreUrunSitesi
             services.AddHttpClient(); // Controller da Ihttpclientfactory kullanabilmek için
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(x =>
             {
-                x.LoginPath = "/ApiAdmin/Login"; // Admin giriþ ekranýmýz
+                x.LoginPath = "/Account/UserLogin"; // Admin giriþ ekranýmýz
+                x.Cookie.Name = "ApiAdmin";
+                x.AccessDeniedPath = "/AccesDenied";
             });
-
+            // Authorization : Yetkilendirme : Önce servis olarak ekliyoruz
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("AdminPolicy", policy => policy.RequireClaim("Role", "Admin")); // Bundan sonra Controller lara Policy i belirtmeliyiz..
+                options.AddPolicy("UserPolicy", policy => policy.RequireClaim("Role", "User"));
+            });
             //Diðer Dependency Injection yöntemleri :
             // AddSingleton : Uygulama ayaða kalkarken çalýþan ConfigureServices metodunda bu yöntem ile tanýmladýðýmýz her sýnýftan sadece bir örnek oluþturulur. Kim nereden çaðýrýrsa çaðýrsýn kendisine bu örnek gönderilir. Uygulama yeniden baþlayana kadar yenisi üretilmez.
             // AddTransient : Uygulama çalýþma zamanýnda belirli koþullarda üretilir veya varolan örneði kullanýr. 
